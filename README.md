@@ -37,6 +37,10 @@ Presented below are all command line options/arguments:
 
 + \-r, --pennsouth-shareholders-report=y/n                             Option to create Penn South Shareholders Report (a list of all Penn South Shareholders): y/n [default: "n"]
 
++ \-r, --report-on-apts-where-no-shareholder-has-email-address=y/n   Option to create Penn South Shareholders With No Email + Shareholders Wanting Hard-Copy of All Communications Report: y/n [default: "n"]
+
++ \-r, --report-on-apts-shareholder-wants-minutes-hard-copy=y/n   Option to create Penn South Shareholders With No Email + Shareholders Only Wanting Hard-Copy of Board Minutes Report: y/n [default: "n"]
+
 
 
 **Example:**
