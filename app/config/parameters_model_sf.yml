@@ -1,0 +1,16 @@
+# This file is a copy of parameters.yml
+#  for the purpose of showing the parameters
+#   that are stored in it. It will be saved to github
+#   as opposed to parameters.yml which for security
+#   reasons is not stored in github.
+parameters:
+    database_host: 127.0.0.1
+    database_port: 3306
+    database_name: pennsout_db
+    database_user: pennsouth_admin
+    database_password: xxxxxxxx
+    mailer_transport: smtp
+    mailer_host: smtp.gmail.com
+    mailer_user: pennsouthdata@gmail.com
+    mailer_password: xxxxxx
+    secret: b589eff6e948ca763e6c2b9d5f3d933341dad32f

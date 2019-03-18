@@ -1,0 +1,32 @@
+Invoking the process to read the MDS_Export table and use it to update the Pennsouth subscriber email lists defined in Aweber.com
+============
+
+
+Program run start date/time: 2017-11-25 19:09:28
+
+ getenv('SYMFONY_ENV'): prod
+
+   environment: prod
+
+ $rootDir: /home/pennsouthdata/pennsouth_reports
+
+ $appOutputDir: /home/pennsouthdata/home/mgmtoffice/public_ftp
+
+ current_user: root
+
+run Parking Lot Report set to false. 
+
+run MDS Change Detection Report set to false. 
+
+run Homeowners Insurance Report set to false. 
+
+run Income Affidavit Report set to false. 
+
+run MDS Data Entry Discrepancies Report set to false. 
+
+run Pennsouth Shareholders Report set to true. 
+
+Run Report on Apartments with No Email Address set to false. 
+
+ memory_limit: 128M
+Program run end date/time: 2017-11-25 19:09:30
