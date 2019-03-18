@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Pennsouth\MdsBundle\Entity\MdsExport" table="mds_export">
+    <id name="mdsExportId" type="integer" column="Mds_export_id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="building" type="string" column="Building" length="2" nullable="false">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="mdsApt" type="string" column="MDS_Apt" length="4" nullable="false">
+      <options>
+        <option name="fixed"/>
+        <option name="comment">Format that MDS stores Apt combining floor and apartment line. E.g. 1A.</option>
+      </options>
+    </field>
+    <field name="floorNumber" type="integer" column="Floor_Number" nullable="true">
+      <options>
+        <option name="unsigned"/>
+        <option name="comment">Parsed value of MDS_Apt, extracting only Floor Number.</option>
+      </options>
+    </field>
+    <field name="aptLine" type="string" column="Apt_Line" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+        <option name="comment">Parsed value of MDS_Apt, extracting only apartment line portion, i.e., A-J.</option>
+      </options>
+    </field>
+    <field name="firstName" type="string" column="First_Name" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="lastName" type="string" column="Last_Name" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="emailAddress" type="string" column="Email_Address" length="70" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="category" type="string" column="Category" length="100" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="categoryInterpreted" type="string" column="Category_interpreted" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="daytimePhone" type="string" column="Daytime_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="eveningPhone" type="string" column="Evening_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="cellPhone" type="string" column="Cell_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="fax" type="string" column="Fax" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="tenantId" type="string" column="Tenant_Id" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="personId" type="string" column="Person_Id" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="dateOfBirth" type="datetime" column="Date_Of_Birth" nullable="true"/>
+    <field name="decalNum" type="string" column="Decal_Num" length="5" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="vehicleRegExpDate" type="datetime" column="Vehicle_Reg_Exp_Date" nullable="true"/>
+    <field name="homeownerInsuranceExpDate" type="datetime" column="Homeowner_Insurance_Exp_Date" nullable="true"/>
+    <field name="storageLockerClosetBldgNum" type="string" column="Storage_Locker_Closet_Bldg_Num" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="storageLockerNum" type="string" column="Storage_Locker_Num" length="10" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="storageClosetFloorNum" type="integer" column="Storage_Closet_Floor_Num" nullable="true">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <field name="dogTagNum" type="string" column="Dog_Tag_Num" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="bikeRackLocation" type="string" column="Bike_Rack_Location" length="10" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="bikeRackBldg" type="string" column="Bike_Rack_Bldg" length="2" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="bikeRackRoom" type="string" column="Bike_Rack_Room" length="2" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="statusCodes" type="string" column="Status_Codes" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="standardLockboxTenantId" type="string" column="Standard_Lockbox_Tenant_Id" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="moveInDate" type="datetime" column="Move_In_Date" nullable="true"/>
+    <field name="toddlerRoomMember" type="string" column="Toddler_Room_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="shareholderFlag" type="string" column="shareholder_flag" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="incAffidavitReceiptDate" type="datetime" column="inc_affidavit_receipt_date" nullable="true"/>
+    <field name="incAffidavitReceived" type="string" column="inc_affidavit_received" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="incAffidavitDateDiscrepancy" type="string" column="inc_affidavit_date_discrepancy" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="youthRoomMember" type="string" column="Youth_Room_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="ceramicsMember" type="string" column="Ceramics_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="gardenMember" type="string" column="Garden_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="woodworkingMember" type="string" column="Woodworking_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="gymMember" type="string" column="Gym_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="aptSurrendered" type="string" column="apt_surrendered" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="lastChangedDate" type="datetime" column="Last_Changed_Date" nullable="true"/>
+  </entity>
+</doctrine-mapping>

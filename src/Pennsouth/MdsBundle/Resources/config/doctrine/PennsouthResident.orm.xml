@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Pennsouth\MdsBundle\Entity\PennsouthResident" table="pennsouth_resident">
+    <indexes>
+      <index name="fk_Pennsouth_Resident_Pennsouth_Apt1_idx" columns="Pennsouth_Apt_apartment_id"/>
+    </indexes>
+    <id name="pennsouthResidentId" type="integer" column="Pennsouth_Resident_id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="building" type="string" column="Building" length="2" nullable="false">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="floorNumber" type="integer" column="Floor_Number" nullable="false">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <field name="aptLine" type="string" column="Apt_Line" length="1" nullable="false">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="lastName" type="string" column="Last_Name" length="45" nullable="false">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="firstName" type="string" column="First_Name" length="45" nullable="false">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="emailAddress" type="string" column="Email_Address" length="70" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="mdsResidentCategory" type="string" column="MDS_Resident_Category" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="daytimePhone" type="string" column="Daytime_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="eveningPhone" type="string" column="Evening_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="cellPhone" type="string" column="Cell_Phone" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="fax" type="string" column="Fax" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="personId" type="string" column="Person_Id" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="toddlerRoomMember" type="string" column="Toddler_Room_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="youthRoomMember" type="string" column="Youth_Room_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="ceramicsMember" type="string" column="Ceramics_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="woodworkingMember" type="string" column="Woodworking_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="gymMember" type="string" column="Gym_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="gardenMember" type="string" column="Garden_Member" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="decalNum" type="integer" column="Decal_Num"  nullable="true">
+      <options>
+        <option name="fixed"/>
+        <option name="comment">Decal Number for Parking Lot.</option>
+      </options>
+    </field>
+    <field name="parkingLotLocation" type="string" column="Parking_Lot_Location" length="5" nullable="true">
+      <options>
+        <option name="fixed"/>
+        <option name="comment">Values: LOWER/UPPER</option>
+      </options>
+    </field>
+    <field name="vehicleRegExpDate" type="datetime" column="Vehicle_Reg_Exp_Date" nullable="true"/>
+    <field name="vehicleRegExpCountdown" type="integer" column="Vehicle_Reg_Exp_Countdown" nullable="true">
+      <options>
+        <option name="unsigned"/>
+        <option name="comment">Number of Days till Expiration of vehicle registration. 0=has expired.</option>
+      </options>
+    </field>
+    <field name="vehicleRegIntervalRemaining" type="integer" column="vehicle_reg_interval_remaining" nullable="true">
+       <options>
+         <option name="unsigned"/>
+         <option name="comment">Interval remaining before expiration of insurance. Values: 0, 10, 21. Null means the value is outside of any of these ranges.</option>
+       </options>
+     </field>
+    <field name="vehicleModel" type="string" column="vehicle_model" length="35" nullable="true">
+    <options>
+      <option name="fixed"/>
+    </options>
+  </field>
+    <field name="vehicleLicensePlateNum" type="string" column="vehicle_license_plate_num" length="7" nullable="true">
+        <options>
+          <option name="fixed"/>
+        </options>
+    </field>
+    <field name="homeownerInsExpDate" type="datetime" column="Homeowner_Ins_Exp_Date" nullable="true">
+      <options>
+        <option name="comment">Date of Expiration of Homeowners insurance.</option>
+      </options>
+    </field>
+    <field name="homeownerInsExpCountdown" type="integer" column="Homeowner_Ins_Exp_Countdown" nullable="true">
+      <options>
+        <option name="unsigned"/>
+        <option name="comment">Number of Days till Expiration. 0=has expired.</option>
+      </options>
+    </field>
+    <field name="homeownerInsIntervalRemaining" type="integer" column="homeowner_ins_interval_remaining" nullable="true">
+       <options>
+         <option name="unsigned"/>
+         <option name="comment">Interval remaining before expiration of insurance. Values: 0, 10, 21. Null means the value is outside of any of these ranges.</option>
+       </options>
+     </field>
+    <field name="birthDate" type="datetime" column="Birth_Date" nullable="true"/>
+    <field name="moveInDate" type="datetime" column="Move_In_Date" nullable="true"/>
+    <field name="shareholderFlag" type="string" column="shareholder_flag" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="incAffidavitReceiptDate" type="datetime" column="inc_affidavit_receipt_date" nullable="true"/>
+    <field name="incAffidavitReceived" type="string" column="inc_affidavit_received" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="incAffidavitDateDiscrepancy" type="string" column="inc_affidavit_date_discrepancy" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="storageLockerClosetBldgNum" type="string" column="Storage_Locker_Closet_Bldg_Num" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="storageLockerNum" type="string" column="Storage_Locker_Num" length="10" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="storageClosetFloorNum" type="string" column="Storage_Closet_Floor_Num" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="dogTagNum" type="string" column="Dog_Tag_Num" length="20" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="isDogInApt" type="string" column="Is_Dog_In_Apt" length="1" nullable="true">
+      <options>
+        <option name="fixed"/>
+        <option name="comment">Values: Y/N</option>
+      </options>
+    </field>
+    <field name="bikeRackLocation" type="string" column="Bike_Rack_Location" length="10" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="bikeRackBldg" type="string" column="Bike_Rack_Bldg" length="2" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="bikeRackRoom" type="string" column="Bike_Rack_Room" length="2" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="aptSurrendered" type="string" column="apt_surrendered" length="45" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="lastChangedDate" type="datetime" column="Last_Changed_Date" nullable="true"/>
+    <many-to-one field="pennsouthAptApartment" target-entity="PennsouthApt" fetch="LAZY">
+      <join-columns>
+        <join-column name="Pennsouth_Apt_apartment_id" referenced-column-name="apartment_id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>
