@@ -508,7 +508,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 $messageBody = "\n A document containing a list of apartments with no shareholder having an email address has been created. \n ";
                 $messageBody .= " \n The spreadsheet is attached to this email. It is also available on the Pennsouth Ftp Server. \n";
                 $attachmentFilePath = $appOutputDir . "/" . AptsWithNoShareholderHavingEmailReportWriter::LIST_APTS_WITH_NO_SHAREHOLDER_EMAIL_ADDRESS_FILE_NAME;
-                $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
+                // No need for notification
+                // $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
                 exit(0);
             } catch (\Exception $exception) {
                 print("\n Exception encountered when running the function to create a list of apartments where no shareholder has email.");
@@ -534,7 +535,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 $messageBody = "\n A document containing a list of apartments where shareholder wants Board Minutes hard copy has been created. \n ";
                 $messageBody .= " \n The spreadsheet is attached to this email. It is also available on the Pennsouth Ftp Server. \n";
                 $attachmentFilePath = $appOutputDir . "/" . AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter::LIST_APTS_WHERE_SHAREHOLDER_WANTS_MINUTES_HARD_COPY_FILE_NAME;
-                $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
+                // No need for notification
+                // $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
                 exit(0);
             } catch (\Exception $exception) {
                 print("\n Exception encountered when running the function to create a list of apartments where shareholder wants Board Minutes hard copy.");
