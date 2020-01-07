@@ -864,7 +864,7 @@ class ManagementReportsWriter
 
 
     /**
-     *       1/6/2019 - SQL modified to include ALL pennsouth apartments - UNION of 2 selects
+     *       1/6/2020 - SQL modified to include ALL pennsouth apartments - UNION of 2 selects
      *          - 1) returns apts where there is no designated shareholder
      *          - 2) returns apts having a designated shareholder (the vast majority fall in this category)
      * @return array
