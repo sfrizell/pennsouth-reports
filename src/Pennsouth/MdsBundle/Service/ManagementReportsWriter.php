@@ -730,114 +730,114 @@ class ManagementReportsWriter
                            pr3.cell_phone, pr3.evening_phone, 
                             \'\' last_name2, \'\' first_name2, \'\' email_address2,
                            \'\' cell_phone2, \'\' evening_phone2     
-from pennsouth_apt as pa
- left join	 pennsouth_resident as pr3
-  ON
-	pa.apartment_id = pr3.pennsouth_apt_apartment_id
-  inner join pennsouth_bldg as b1
-  ON 
-    pa.building_id = b1.building_id
-  where  not exists
-( 
-SELECT  \'x\'            
-                 FROM pennsouth_resident as pr
-                           JOIN pennsouth_bldg as b
-                       ON
-                           pr.building = b.building_id
-                           JOIN mds_export as me
-						ON
-							pr.mds_export_id = me.mds_export_id
-                           LEFT JOIN
-                            pennsouth_resident as pr2
-                       ON
-                           pr.building = pr2.building
-                       and pr.floor_number = pr2.floor_number
-                       and pr.apt_line	= pr2.apt_line
-                       and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
-                       and pr.mds_resident_category = pr2.mds_resident_category
-                       and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name) 
-                          LEFT JOIN
-                              mds_export as me2
-                          ON
-                              pr2.mds_export_id = me2.mds_export_id
-                          LEFT JOIN
-                       (
-                       select  distinct apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                       from 
-                            pennsouth_apt as apt
-                            inner join pennsouth_resident as pr
-                       where
-                           apt.apartment_id = pr.Pennsouth_apt_apartment_id
-                       and  not exists (
-                       select  \'x\'
-                       from pennsouth_resident pr2 
-                        where pr.pennsouth_apt_apartment_id = pr2.pennsouth_apt_apartment_id and
-                        pr2.email_address <>:noEmailAddress )
-                        order by apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                       ) 
-                       apts_no_email
+                    from pennsouth_apt as pa
+                     left join	 pennsouth_resident as pr3
+                      ON
+                        pa.apartment_id = pr3.pennsouth_apt_apartment_id
+                      inner join pennsouth_bldg as b1
+                      ON 
+                        pa.building_id = b1.building_id
+                      where  not exists
+                    ( 
+                    SELECT  \'x\'            
+                      FROM pennsouth_resident as pr
+                               JOIN pennsouth_bldg as b
                            ON
-                           pr.building = apts_no_email.building_id
-                       and pr.floor_number = apts_no_email.floor_number
-                       and pr.apt_line		= apts_no_email.apt_line
-                       WHERE
-                           pr.mds_resident_category =:shareholderResidentCategory  
-						and pa.apartment_id = pr.pennsouth_apt_apartment_id)
-UNION
-SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', b.zip) city_state_zip, 
-                           pr.floor_number, pr.apt_line, pr.apt_surrendered, pr2.mds_resident_category mds_2nd_resident_category,
-                           pr.homeowner_ins_exp_date,                        
-                           if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_exp_countdown) homeowner_ins_exp_countdown, 
-                           if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_interval_remaining) homeowner_ins_interval_remaining,
-                           if(apts_no_email.building_id is not null, \'No Email for Apartment\', \'\') no_email_for_apartment,
-                           if( length(trim(pr.email_address)) = 0 and (length(trim(pr2.email_address)) = 0 or pr2.email_address is null), \'No Email for Shareholders\', \'\') no_email_for_shareholders,
-                           pr.last_name, pr.first_name, me.email_address, if(pr.mds_resident_category = \'SHAREHOLDER\', \'\', \'No Designated Shareholder\') as shareholder_status, 
-                           pr.cell_phone, pr.evening_phone, 
-                           pr2.last_name last_name2, pr2.first_name first_name2, me2.email_address email_address2,
-                           pr2.cell_phone cell_phone2, pr2.evening_phone evening_phone2                                
-                       FROM pennsouth_resident as pr
-                           JOIN pennsouth_bldg as b
-                       ON
-                           pr.building = b.building_id
-                           JOIN mds_export as me
-						ON
-							pr.mds_export_id = me.mds_export_id
-                           LEFT JOIN
-                            pennsouth_resident as pr2
-                       ON
-                           pr.building = pr2.building
-                       and pr.floor_number = pr2.floor_number
-                       and pr.apt_line	= pr2.apt_line
-                       and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
-                       and pr.mds_resident_category = pr2.mds_resident_category
-                       and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name) 
-                          LEFT JOIN
-                              mds_export as me2
-                          ON
-                              pr2.mds_export_id = me2.mds_export_id
-                          LEFT JOIN
-                       (
-                       select  distinct apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                       from 
-                            pennsouth_apt as apt
-                            inner join pennsouth_resident as pr
-                       where
-                           apt.apartment_id = pr.Pennsouth_apt_apartment_id
-                       and  not exists (
-                       select  \'x\'
-                       from pennsouth_resident pr2 
-                        where pr.pennsouth_apt_apartment_id = pr2.pennsouth_apt_apartment_id and
-                        pr2.email_address <> :noEmailAddress)
-                        order by apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                       ) 
-                       apts_no_email
+                               pr.building = b.building_id
+                               JOIN mds_export as me
+                            ON
+                                pr.mds_export_id = me.mds_export_id
+                               LEFT JOIN
+                                pennsouth_resident as pr2
                            ON
-                           pr.building = apts_no_email.building_id
-                       and pr.floor_number = apts_no_email.floor_number
-                       and pr.apt_line		= apts_no_email.apt_line
-                       WHERE
-                           pr.mds_resident_category =:shareholderResidentCategory                         
-                       order by 1, 4, 5, 7 desc'; // building / floor_num / apt line / 2nd resident_category
+                               pr.building = pr2.building
+                           and pr.floor_number = pr2.floor_number
+                           and pr.apt_line	= pr2.apt_line
+                           and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
+                           and pr.mds_resident_category = pr2.mds_resident_category
+                           and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name) 
+                              LEFT JOIN
+                                  mds_export as me2
+                              ON
+                                  pr2.mds_export_id = me2.mds_export_id
+                              LEFT JOIN
+                           (
+                           select  distinct apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
+                           from 
+                                pennsouth_apt as apt
+                                inner join pennsouth_resident as pr
+                           where
+                               apt.apartment_id = pr.Pennsouth_apt_apartment_id
+                           and  not exists (
+                           select  \'x\'
+                           from pennsouth_resident pr2 
+                            where pr.pennsouth_apt_apartment_id = pr2.pennsouth_apt_apartment_id and
+                            pr2.email_address <>:noEmailAddress )
+                            order by apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
+                           ) 
+                           apts_no_email
+                               ON
+                               pr.building = apts_no_email.building_id
+                           and pr.floor_number = apts_no_email.floor_number
+                           and pr.apt_line		= apts_no_email.apt_line
+                           WHERE
+                               pr.mds_resident_category =:shareholderResidentCategory  
+                            and pa.apartment_id = pr.pennsouth_apt_apartment_id)
+        UNION
+          SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', b.zip) city_state_zip, 
+                                   pr.floor_number, pr.apt_line, pr.apt_surrendered, pr2.mds_resident_category mds_2nd_resident_category,
+                                   pr.homeowner_ins_exp_date,                        
+                                   if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_exp_countdown) homeowner_ins_exp_countdown, 
+                                   if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_interval_remaining) homeowner_ins_interval_remaining,
+                                   if(apts_no_email.building_id is not null, \'No Email for Apartment\', \'\') no_email_for_apartment,
+                                   if( length(trim(pr.email_address)) = 0 and (length(trim(pr2.email_address)) = 0 or pr2.email_address is null), \'No Email for Shareholders\', \'\') no_email_for_shareholders,
+                                   pr.last_name, pr.first_name, me.email_address, if(pr.mds_resident_category = \'SHAREHOLDER\', \'\', \'No Designated Shareholder\') as shareholder_status, 
+                                   pr.cell_phone, pr.evening_phone, 
+                                   pr2.last_name last_name2, pr2.first_name first_name2, me2.email_address email_address2,
+                                   pr2.cell_phone cell_phone2, pr2.evening_phone evening_phone2                                
+                               FROM pennsouth_resident as pr
+                                   JOIN pennsouth_bldg as b
+                               ON
+                                   pr.building = b.building_id
+                                   JOIN mds_export as me
+                                ON
+                                    pr.mds_export_id = me.mds_export_id
+                                   LEFT JOIN
+                                    pennsouth_resident as pr2
+                               ON
+                                   pr.building = pr2.building
+                               and pr.floor_number = pr2.floor_number
+                               and pr.apt_line	= pr2.apt_line
+                               and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
+                               and pr.mds_resident_category = pr2.mds_resident_category
+                               and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name) 
+                                  LEFT JOIN
+                                      mds_export as me2
+                                  ON
+                                      pr2.mds_export_id = me2.mds_export_id
+                                  LEFT JOIN
+                               (
+                               select  distinct apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
+                               from 
+                                    pennsouth_apt as apt
+                                    inner join pennsouth_resident as pr
+                               where
+                                   apt.apartment_id = pr.Pennsouth_apt_apartment_id
+                               and  not exists (
+                               select  \'x\'
+                               from pennsouth_resident pr2 
+                                where pr.pennsouth_apt_apartment_id = pr2.pennsouth_apt_apartment_id and
+                                pr2.email_address <> :noEmailAddress)
+                                order by apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
+                               ) 
+                               apts_no_email
+                                   ON
+                                   pr.building = apts_no_email.building_id
+                               and pr.floor_number = apts_no_email.floor_number
+                               and pr.apt_line		= apts_no_email.apt_line
+                               WHERE
+                                   pr.mds_resident_category =:shareholderResidentCategory                         
+                               order by 1, 4, 5, 7 desc'; // building / floor_num / apt line / 2nd resident_category
 
 
 
@@ -862,115 +862,85 @@ SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', 
 
     }
 
+
     /**
-        * NOTE: 10/29/2018 - can remove the select with reference to aweber_mds_sync_audit without any harm...
-        * @return array
-        * @throws \Exception
-        */
-       private function getHomeownersInsuranceReportRows_old() {
-
-           try {
-
-               $query =
-                         'SELECT  distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', b.zip) city_state_zip, 
-                              pr.floor_number, pr.apt_line, pr.apt_surrendered, 
-                              pr.homeowner_ins_exp_date,                        
-                              if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_exp_countdown) homeowner_ins_exp_countdown, 
-                              if (length(pr.apt_surrendered) > 0, \'\', pr.homeowner_ins_interval_remaining) homeowner_ins_interval_remaining,
-                              if(apts_no_email.building_id is not null, \'No Email for Apartment\', \'\') no_email_for_apartment,
-                              if( length(trim(pr.email_address)) = 0 and (length(trim(pr2.email_address)) = 0 or pr2.email_address is null), \'No Email for Shareholders\', \'\') no_email_for_shareholders,
-                              pr.last_name, pr.first_name, me.email_address, pr.cell_phone, pr.evening_phone, 
-                              pr2.mds_resident_category, pr2.last_name last_name2, pr2.first_name first_name2, me2.email_address email_address2,
-                              pr2.cell_phone cell_phone2, pr2.evening_phone evening_phone2                                
-                          FROM pennsouth_resident as pr
-                              JOIN pennsouth_bldg as b
-                          ON
-                              pr.building = b.building_id
-                              JOIN mds_export as me
-   						ON
-   							pr.mds_export_id = me.mds_export_id
-                              LEFT JOIN
-                               pennsouth_resident as pr2
-                          ON
-                              pr.building = pr2.building
-                          and pr.floor_number = pr2.floor_number
-                          and pr.apt_line	= pr2.apt_line
-                          and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
-                          and pr.mds_resident_category = pr2.mds_resident_category
-                          and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name) 
-                             LEFT JOIN
-                                 mds_export as me2
-                             ON
-                                 pr2.mds_export_id = me2.mds_export_id
-                             LEFT JOIN
-                          (
-                          select  distinct apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                          from 
-                               pennsouth_apt as apt
-                               inner join pennsouth_resident as pr
-                          where
-                              apt.apartment_id = pr.Pennsouth_apt_apartment_id
-                          and  not exists (
-                          select  \'x\'
-                          from pennsouth_resident pr2 
-                           where pr.pennsouth_apt_apartment_id = pr2.pennsouth_apt_apartment_id and
-                           pr2.email_address <>:emailAddress)
-                           and  not exists (
-                          select  \'x\'
-                          from aweber_mds_sync_audit msa 
-                           where pr.building = msa.aweber_building
-                           and pr.floor_number = msa.aweber_floor_number
-                           and pr.apt_line = msa.aweber_apt_line 
-                           and msa.update_action =:updateAction
-                           and msa.Aweber_Subscriber_Status =:subscriberStatus)
-                           order by apt.building_id, apt.floor_number, apt.apt_line, apt.apartment_name
-                          ) apts_no_email
-                              ON
-                              pr.building = apts_no_email.building_id
-                          and pr.floor_number = apts_no_email.floor_number
-                          and pr.apt_line		= apts_no_email.apt_line
-                          WHERE
-                               pr.mds_resident_category =:residentCategory 
-                          order by pr.building, pr.floor_number, pr.apt_line, pr2.mds_resident_category desc';
-
-
-
-                   $statement = $this->getEntityManager()->getConnection()->prepare($query);
-                   // Set parameters
-                   $statement->bindValue( 'emailAddress', '');
-                   $statement->bindValue( 'updateAction', 'reporting');
-                   $statement->bindValue( 'subscriberStatus', 'subscribed');
-                   $statement->bindValue( 'residentCategory', 'SHAREHOLDER');
-
-                   $statement->execute();
-
-                   $homeownersInsuranceReportRows = $statement->fetchAll();
-
-                   return $homeownersInsuranceReportRows;
-           }
-           catch (\Exception $exception) {
-               print("\n" . "Fatal Exception occurred in ManagementReportsWriter->getHomeownersInsuranceReportRows! ");
-               print ("\n Exception->getMessage() : " . $exception->getMessage());
-               print "Type: " . $exception->getCode(). "\n";
-               print("\n" . "Exiting from program.");
-               throw $exception;
-           }
-
-       }
-
+     *       1/6/2019 - SQL modified to include ALL pennsouth apartments - UNION of 2 selects
+     *          - 1) returns apts where there is no designated shareholder
+     *          - 2) returns apts having a designated shareholder (the vast majority fall in this category)
+     * @return array
+     * @throws \Exception
+     */
     private function getIncomeAffidavitReportRows() {
 
         try {
 
             $query =
-                      'SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', b.zip) city_state_zip, 
+                        'SELECT  distinct pr3.building, b1.address, concat( b1.city, \', \', b1.state, \' \', b1.zip) city_state_zip, 
+                              pr3.floor_number, pr3.apt_line, pr3.apt_surrendered, 
+							\'\' no_email_for_apartment,
+                           if( length(trim(pr3.email_address)) = 0, \'No Email for Shareholders\', \'\') no_email_for_shareholders,
+                           pr3.last_name, pr3.first_name, 
+                           \'\' mds_export_email_address, pr3.cell_phone, pr3.evening_phone, 
+                           if(pr3.mds_resident_category = \'SHAREHOLDER\', \'\', \'No Designated Shareholder\') as shareholder_status, 
+                               \' \' last_name2, \' \' first_name2, \' \' email_address2,
+                                \' \'  cell_phone2, \' \' evening_phone2,
+                               \'\' inc_affidavit_receipt_date, \'\' inc_affidavit_received,
+                                \'\' inc_affidavit_date_discrepancy, \'\' first_annual_deadline,
+                                \'\' second_annual_deadline, \'\' late_charge1, 
+                                \'\' late_charge2, \'\' move_in_date                               
+                        from pennsouth_apt as pa
+                         left join	 pennsouth_resident as pr3
+                          ON
+                            pa.apartment_id = pr3.pennsouth_apt_apartment_id
+                          inner join pennsouth_bldg as b1
+                          ON 
+                            pa.building_id = b1.building_id
+                          where  not exists
+                          (
+                           SELECT  \'X\'        
+                                 FROM 
+							income_affidavit as ia
+                            JOIN
+							pennsouth_resident as pr
+                            ON ia.income_affidavit_id = 1
+                           JOIN pennsouth_bldg as b
+                       ON
+                           pr.building = b.building_id
+                           JOIN mds_export as me
+						ON
+							pr.mds_export_id = me.mds_export_id
+                           LEFT JOIN
+                            pennsouth_resident as pr2
+                       ON
+                           pr.building = pr2.building
+                       and pr.floor_number = pr2.floor_number
+                       and pr.apt_line	= pr2.apt_line
+                       and pr.pennsouth_resident_id < pr2.pennsouth_resident_id
+                       and pr.mds_resident_category = pr2.mds_resident_category
+                       and concat(pr.first_name, pr.last_name) <> concat(pr2.first_name, pr2.last_name)
+                           LEFT JOIN
+                           mds_export as me2
+						ON
+                           pr2.mds_export_id = me2.mds_export_id
+                           LEFT JOIN
+                       missing_email_apt apts_no_email
+                           ON
+                           pr.building = apts_no_email.building_id
+                       and pr.floor_number = apts_no_email.floor_number
+                       and pr.apt_line		= apts_no_email.apt_line
+                       WHERE
+                           pr.mds_resident_category =:residentCategory
+                                  and  pa.apartment_id = pr.Pennsouth_Apt_apartment_id     
+  )     
+            UNION
+                SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', b.zip) city_state_zip, 
                            pr.floor_number, pr.apt_line, 
                            pr.apt_surrendered, 
                            if(apts_no_email.building_id is not null, \'No Email for Apartment\', \'\') no_email_for_apartment,
                            if( length(trim(pr.email_address)) = 0 and (length(trim(pr2.email_address)) = 0 or pr2.email_address is null), \'No Email for Shareholders\', \'\') no_email_for_shareholders,
                            pr.last_name, pr.first_name, 
                            me.email_address mds_export_email_address, pr.cell_phone, pr.evening_phone, 
-                           pr.mds_resident_category, 
+                           if(pr.mds_resident_category = \'SHAREHOLDER\', \'\', \'No Designated Shareholder\') as shareholder_status, 
                            if(pr2.last_name is null, \'\', pr2.last_name) last_name2, if(pr2.first_name is null, \'\', pr2.first_name) first_name2, 
                            if(me2.email_address is null, \'\', me2.email_address) mds_export_email_address2,
                            if(pr2.cell_phone is null, \'\', pr2.cell_phone) cell_phone2, if(pr2.evening_phone is null, \'\', pr2.evening_phone) evening_phone2,
@@ -1050,7 +1020,7 @@ SELECT distinct pr.building, b.address, concat( b.city, \', \', b.state, \' \', 
                        and pr.apt_line		= apts_no_email.apt_line
                        WHERE
                            pr.mds_resident_category =:residentCategory
-                       order by pr.building, pr.floor_number, pr.apt_line ASC, pr2.mds_resident_category desc';
+                       order by 1, 4, 5 ASC, 14 desc'; // building_id, floor_number, apt_line asc, mds_resident_category desc
 
 
 
