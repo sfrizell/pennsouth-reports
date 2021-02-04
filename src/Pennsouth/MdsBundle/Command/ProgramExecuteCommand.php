@@ -16,6 +16,7 @@ use Pennsouth\MdsBundle\Service\AptsWithNoShareholderHavingEmailReportWriter;
 use Pennsouth\MdsBundle\Service\AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter;
 use Pennsouth\MdsBundle\Service\ManagementReportsWriter;
 use Pennsouth\MdsBundle\Service\MdsChangeDetectionReportWriter;
+use Pennsouth\MdsBundle\Service\MemoDistributionListReportWriter;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,6 +46,7 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
     const DEFAULT_ADMIN_EMAIL_RECIPIENT_NAME          = 'Stephen Frizell';
     const REPORT_ON_APTS_WITH_NO_EMAIL                  = 'report-on-apts-where-no-resident-has-email-address';
     const REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL      = 'report-on-apts-where-no-shareholder-has-email-address';
+    const MEMO_DISTRIBUTION_LIST_REPORT                 = 'memo-distribution-list-report';
     const REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY      = 'report-on-apts-shareholder-wants-minutes-hard-copy';
     const PARKING_LOT_REPORT                            = 'parking-lot-report';
     const MDS_CHANGE_DETECTION_REPORT                   = 'MDS-change-detection-report';
@@ -63,6 +65,7 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
     private $adminEmailNotifyRecipients = array();
     private $runReportOnAptsWithNoEmail;
     private $runReportOnAptsWithNoShareholderEmail;
+    private $runMemoDistributionListReport;
     private $runReportOnAptsShareholderWantsMinutesHardCopy;
     private $runParkingLotReport;
     private $runMdsChangeDetectionReport;
@@ -81,6 +84,9 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 // the short description shown while running "php bin/console list"
                 ->setDescription('Run Penn South reports.')
 
+            // example of command to invoke this program to run a report - (for some reason have trouble running without the full name of the report-name parameter):
+                //  php app/console  app:pennsouth-reports --memo-distribution-list-report=y
+
                 // the full command description shown when running the command with
                 // the "--help" option
                 ->setHelp("This command runs Pennsouth reports based on input parameters to determine which reports to run..." . "\n"
@@ -96,6 +102,7 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                         new InputOption(self::PENNSOUTH_SHAREHOLDERS_REPORT, 'r', InputOption::VALUE_REQUIRED, 'Option to create Pennsouth Shareholders Report: y/n', 'n'),
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_EMAIL, 'b', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no resident has email address.: y/n', 'n'),
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL, 'a', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address.: y/n', 'n'),
+                        new InputOption(self::MEMO_DISTRIBUTION_LIST_REPORT, 'g', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address and apt not surrendered (Memo Distribution List).: y/n', 'n'),
                         new InputOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY, 'f', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where shareholder wants Minutes hard copy.: y/n', 'n'),
                     ))
                 )
@@ -197,6 +204,10 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                                                : ( strtolower($input->getOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL)) == 'y' ? TRUE : FALSE ) );
 
         // default is FALSE, so anything other than parameter of 'y' is interpreted as FALSE...
+        $this->runMemoDistributionListReport = ( is_null( $input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) ? FALSE
+            : ( strtolower($input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) == 'y' ? TRUE : FALSE ) );
+
+        // default is FALSE, so anything other than parameter of 'y' is interpreted as FALSE...
         $this->runReportOnAptsShareholderWantsMinutesHardCopy = ( is_null( $input->getOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY)) ? FALSE
                                                : ( strtolower($input->getOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY)) == 'y' ? TRUE : FALSE ) );
 
@@ -276,6 +287,15 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
         }
         else {
             print ("\n" . "Run Report on Apartments with No Shareholder Email Address set to false. \n");
+        }
+
+        if ($this->runMemoDistributionListReport) {
+            print ("\n" . "Run Memo Distribution List Report set to true. \n");
+            $this->emailNotifyReportOrProcessName = self::MEMO_DISTRIBUTION_LIST_REPORT;
+            $processCtr++;
+        }
+        else {
+            print ("\n" . "Run Memo Distribution List Report set to false. \n");
         }
 
         if ($this->runReportOnAptsShareholderWantsMinutesHardCopy) {
@@ -517,6 +537,32 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 print("\n stacktrace: " . $exception->getTraceAsString());
                 print("\n Exiting from program.");
                 $subjectLine = "Fatal exception encountered in Pennsouth Reports Program in section where list of apartments with no shareholder email address is generated.";
+                $messageBody = "\n Exception->getMessage() : " . $exception->getMessage() . "\n";
+                $messageBody .= "\n" . "Exception stack trace: " . $exception->getTraceAsString();
+                $this->isExceptionRaised = TRUE;
+                $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised);
+                exit(1);
+            }
+        }
+
+        if ($this->runMemoDistributionListReport) {
+            try {
+                $phpExcel = $this->getContainer()->get('phpexcel');
+                $memoDistributionListCreator = new MemoDistributionListReportWriter($this->getEntityManager(), $phpExcel, $appOutputDir, $env);
+                $memoDistributionListCreator->createSpreadsheetMemoDistributionList();
+                $subjectLine = "Memo Distribution List Created.";
+                $messageBody = "\n A document containing a list of apartments with no shareholder having an email address where apt has not been surrendered has been created (Memo Distribution List). \n ";
+                $messageBody .= " \n The spreadsheet is attached to this email. It is also available on the Pennsouth Ftp Server. \n";
+                $attachmentFilePath = $appOutputDir . "/" . MemoDistributionListReportWriter::MEMO_DISTRIBUTION_LIST_FILE_NAME;
+                // No need for notification
+                // $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
+                exit(0);
+            } catch (\Exception $exception) {
+                print("\n Exception encountered when running the function to create the Memo Distribution List.");
+                print("\n Exception->getMessage(): " . $exception->getMessage());
+                print("\n stacktrace: " . $exception->getTraceAsString());
+                print("\n Exiting from program.");
+                $subjectLine = "Fatal exception encountered in Pennsouth Reports Program in section where the Memo Distribution List is generated.";
                 $messageBody = "\n Exception->getMessage() : " . $exception->getMessage() . "\n";
                 $messageBody .= "\n" . "Exception stack trace: " . $exception->getTraceAsString();
                 $this->isExceptionRaised = TRUE;
