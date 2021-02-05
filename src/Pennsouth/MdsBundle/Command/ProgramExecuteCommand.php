@@ -17,6 +17,7 @@ use Pennsouth\MdsBundle\Service\AptsWhereShareholderWantsOnlyMinutesHardCopyRepo
 use Pennsouth\MdsBundle\Service\ManagementReportsWriter;
 use Pennsouth\MdsBundle\Service\MdsChangeDetectionReportWriter;
 use Pennsouth\MdsBundle\Service\MemoDistributionListReportWriter;
+use Pennsouth\MdsBundle\Service\MinutesHardCopyForDistributionReportWriter;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +48,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
     const REPORT_ON_APTS_WITH_NO_EMAIL                  = 'report-on-apts-where-no-resident-has-email-address';
     const REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL      = 'report-on-apts-where-no-shareholder-has-email-address';
     const MEMO_DISTRIBUTION_LIST_REPORT                 = 'memo-distribution-list-report';
-    const REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY      = 'report-on-apts-shareholder-wants-minutes-hard-copy';
+    const REPORT_MINUTES_HARD_COPY_FOR_REFERENCE        = 'report-minutes-hard-copy-for-reference';
+    const REPORT_MINUTES_HARD_COPY_FOR_DISTRIBUTION      = 'report-minutes-hard-copy-for-distribution';
     const PARKING_LOT_REPORT                            = 'parking-lot-report';
     const MDS_CHANGE_DETECTION_REPORT                   = 'MDS-change-detection-report';
     const HOMEOWNERS_INSURANCE_REPORT                   = 'homeowners-insurance-report';
@@ -66,7 +68,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
     private $runReportOnAptsWithNoEmail;
     private $runReportOnAptsWithNoShareholderEmail;
     private $runMemoDistributionListReport;
-    private $runReportOnAptsShareholderWantsMinutesHardCopy;
+    private $runReportMinutesHardCopyForReference;
+    private $runReportMinutesHardCopyForDistribution;
     private $runParkingLotReport;
     private $runMdsChangeDetectionReport;
     private $runHomeownersInsuranceReport;
@@ -92,6 +95,23 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 ->setHelp("This command runs Pennsouth reports based on input parameters to determine which reports to run..." . "\n"
                             . " The command has required arguments.")
 
+            // on use of InputOption - using the one-letter shortcut instead of the name of the input option
+                // Example:
+            /**
+            $this
+            // ...
+            ->addOption(
+            'iterations',
+            'i',
+            InputOption::VALUE_REQUIRED,
+            'How many times should the message be printed?',
+            1
+            )
+            ;
+             **/
+             //   Note that to comply with the docopt standard, long options can specify their values after a whitespace or an = sign
+            // (e.g. --iterations 5 or --iterations=5), but short options can only use whitespaces or no separation at all (e.g. -i 5 or -i5).
+
                 ->setDefinition(
                     new InputDefinition(array(
                         new InputOption(self::PARKING_LOT_REPORT, 'p', InputOption::VALUE_REQUIRED, 'Option to create Parking Lot Report: y/n', 'n'),
@@ -103,7 +123,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_EMAIL, 'b', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no resident has email address.: y/n', 'n'),
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL, 'a', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address.: y/n', 'n'),
                         new InputOption(self::MEMO_DISTRIBUTION_LIST_REPORT, 'g', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address and apt not surrendered (Memo Distribution List).: y/n', 'n'),
-                        new InputOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY, 'f', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where shareholder wants Minutes hard copy.: y/n', 'n'),
+                        new InputOption(self::REPORT_MINUTES_HARD_COPY_FOR_REFERENCE, null, InputOption::VALUE_NONE, 'Option to create spreadsheet listing apts where shareholder wants Minutes hard copy -- for reference.'),
+                        new InputOption(self::REPORT_MINUTES_HARD_COPY_FOR_DISTRIBUTION, null, InputOption::VALUE_NONE, 'Option to create spreadsheet listing apts wanting minutes hard copy -- for distribution.'),
                     ))
                 )
             ;
@@ -207,9 +228,10 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
         $this->runMemoDistributionListReport = ( is_null( $input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) ? FALSE
             : ( strtolower($input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) == 'y' ? TRUE : FALSE ) );
 
-        // default is FALSE, so anything other than parameter of 'y' is interpreted as FALSE...
-        $this->runReportOnAptsShareholderWantsMinutesHardCopy = ( is_null( $input->getOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY)) ? FALSE
-                                               : ( strtolower($input->getOption(self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY)) == 'y' ? TRUE : FALSE ) );
+
+        $this->runReportMinutesHardCopyForReference = $input->getOption(self::REPORT_MINUTES_HARD_COPY_FOR_REFERENCE);
+
+        $this->runReportMinutesHardCopyForDistribution = $input->getOption(self::REPORT_MINUTES_HARD_COPY_FOR_DISTRIBUTION);
 
 
 
@@ -298,13 +320,22 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
             print ("\n" . "Run Memo Distribution List Report set to false. \n");
         }
 
-        if ($this->runReportOnAptsShareholderWantsMinutesHardCopy) {
-                    print ("\n" . "Run Report on Apartments where Shareholder Wants Minutes Hard Copy set to true. \n");
-                    $this->emailNotifyReportOrProcessName = self::REPORT_ON_SHAREHOLDER_MINUTES_HARD_COPY;
+        if ($this->runReportMinutesHardCopyForReference) {
+                    print ("\n" . "Run Report on Apartments where Shareholder Wants Minutes Hard Copy for Reference set to true. \n");
+                    $this->emailNotifyReportOrProcessName = self::REPORT_MINUTES_HARD_COPY_FOR_REFERENCE;
                     $processCtr++;
         }
         else {
-            print ("\n" . "Run Report on Apartments where Shareholder Wants Minutes Hard Copy set to false. \n");
+            print ("\n" . "Run Report on Apartments where Shareholder Wants Minutes Hard Copy for Reference set to false. \n");
+        }
+
+        if ($this->runReportMinutesHardCopyForDistribution) {
+            print ("\n" . "Run Report Minutes Hard Copy Report for Distribution set to true. \n");
+            $this->emailNotifyReportOrProcessName = self::REPORT_MINUTES_HARD_COPY_FOR_DISTRIBUTION;
+            $processCtr++;
+        }
+        else {
+            print ("\n" . "Run Report Minutes Hard Copy Report for Distribution set to false. \n");
         }
 
 
@@ -316,7 +347,7 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
 
         // Seems to need 128M (32M default setting on Rose Hosting server is too little - Doctrine query runs out of memory in select from pennsouth_resident...
         $memory_limit = ini_get('memory_limit');
-        print("\n memory_limit: " . $memory_limit);
+        print("\n memory_limit: " . $memory_limit . "\n");
 
         $this->defaultEmailNotifyParameters = new EmailNotifyParameters();
         $this->defaultEmailNotifyParameters->setRecipientEmailAddress(self::DEFAULT_ADMIN_EMAIL_RECIPIENT_ADDRESS);
@@ -572,11 +603,11 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
         }
 
 
-        if ($this->runReportOnAptsShareholderWantsMinutesHardCopy) {
+        if ($this->runReportMinutesHardCopyForReference) {
             try {
                 $phpExcel = $this->getContainer()->get('phpexcel');
-                $aptsWhereShareholderWantsMinutesHardCopyCreator = new AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter($this->getEntityManager(), $phpExcel, $appOutputDir, $env);
-                $aptsWhereShareholderWantsMinutesHardCopyCreator->createSpreadsheetAptsShareholderWantsMinutesHardCopy();
+                $reportMinutesForHardCopyDistributionCreator = new AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter($this->getEntityManager(), $phpExcel, $appOutputDir, $env);
+                $reportMinutesForHardCopyDistributionCreator->createSpreadsheetAptsShareholderWantsMinutesHardCopy();
                 $subjectLine = "List of Apartments Where Shareholder Wants Minutes Hard Copy Created.";
                 $messageBody = "\n A document containing a list of apartments where shareholder wants Board Minutes hard copy has been created. \n ";
                 $messageBody .= " \n The spreadsheet is attached to this email. It is also available on the Pennsouth Ftp Server. \n";
@@ -590,6 +621,33 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                 print("\n stacktrace: " . $exception->getTraceAsString());
                 print("\n Exiting from program.");
                 $subjectLine = "Fatal exception encountered in Pennsouth Reports Program in section where list of apartments where shareholder wants Board Minutes hard copy is generated.";
+                $messageBody = "\n Exception->getMessage() : " . $exception->getMessage() . "\n";
+                $messageBody .= "\n" . "Exception stack trace: " . $exception->getTraceAsString();
+                $this->isExceptionRaised = TRUE;
+                $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised);
+                exit(1);
+            }
+        }
+
+
+        if ($this->runReportMinutesHardCopyForDistribution) {
+            try {
+                $phpExcel = $this->getContainer()->get('phpexcel');
+                $reportMinutesForHardCopyDistributionCreator = new MinutesHardCopyForDistributionReportWriter($this->getEntityManager(), $phpExcel, $appOutputDir, $env);
+                $reportMinutesForHardCopyDistributionCreator->createSpreadsheetMinutesHardCopyForDistribution();
+                $subjectLine = "List of Apartments Where Shareholder Wants Minutes Hard Copy Created (for distribution).";
+                $messageBody = "\n A document containing a list of apartments where shareholder wants Board Minutes hard copy has been created. Version is report for distribution \n ";
+                $messageBody .= " \n The spreadsheet is attached to this email. It is also available on the Pennsouth Ftp Server. \n";
+                $attachmentFilePath = $appOutputDir . "/" . AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter::LIST_APTS_WHERE_SHAREHOLDER_WANTS_MINUTES_HARD_COPY_FILE_NAME;
+                // No need for notification
+                // $this->sendEmailtoAdmins($subjectLine, $messageBody, $this->isExceptionRaised, $attachmentFilePath);
+                exit(0);
+            } catch (\Exception $exception) {
+                print("\n Exception encountered when running the function to create a list of apartments where shareholder wants Board Minutes hard copy (for distribution).");
+                print("\n Exception->getMessage(): " . $exception->getMessage());
+                print("\n stacktrace: " . $exception->getTraceAsString());
+                print("\n Exiting from program.");
+                $subjectLine = "Fatal exception encountered in Pennsouth Reports Program in section where list of apartments where shareholder wants Board Minutes hard copy (for distribution) is generated.";
                 $messageBody = "\n Exception->getMessage() : " . $exception->getMessage() . "\n";
                 $messageBody .= "\n" . "Exception stack trace: " . $exception->getTraceAsString();
                 $this->isExceptionRaised = TRUE;
