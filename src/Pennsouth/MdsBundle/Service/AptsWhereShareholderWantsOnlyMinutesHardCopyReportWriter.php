@@ -21,7 +21,7 @@ use PHPExcel;
 
 class AptsWhereShareholderWantsOnlyMinutesHardCopyReportWriter
 {
-    const LIST_APTS_WHERE_SHAREHOLDER_WANTS_MINUTES_HARD_COPY_FILE_NAME                     = 'printed_board_minutes.xlsx';
+    const LIST_APTS_WHERE_SHAREHOLDER_WANTS_MINUTES_HARD_COPY_FILE_NAME                     = 'printed_board_minutes_for_reference.xlsx';
 
     const APTS_WHERE_SHAREHOLDER_WANTS_MINUTES_HARD_COPY_HEADER_ARRAY = array(
                'Building',
