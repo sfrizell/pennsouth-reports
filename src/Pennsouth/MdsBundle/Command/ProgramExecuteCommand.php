@@ -122,7 +122,7 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
                         new InputOption(self::PENNSOUTH_SHAREHOLDERS_REPORT, 'r', InputOption::VALUE_REQUIRED, 'Option to create Pennsouth Shareholders Report: y/n', 'n'),
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_EMAIL, 'b', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no resident has email address.: y/n', 'n'),
                         new InputOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL, 'a', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address.: y/n', 'n'),
-                        new InputOption(self::MEMO_DISTRIBUTION_LIST_REPORT, 'g', InputOption::VALUE_REQUIRED, 'Option to create spreadsheet listing apts where no shareholder has email address and apt not surrendered (Memo Distribution List).: y/n', 'n'),
+                        new InputOption(self::MEMO_DISTRIBUTION_LIST_REPORT, null, InputOption::VALUE_NONE, 'Option to create spreadsheet listing apts where no shareholder has email address and apt not surrendered (Memo Distribution List).'),
                         new InputOption(self::REPORT_MINUTES_HARD_COPY_FOR_REFERENCE, null, InputOption::VALUE_NONE, 'Option to create spreadsheet listing apts where shareholder wants Minutes hard copy -- for reference.'),
                         new InputOption(self::REPORT_MINUTES_HARD_COPY_FOR_DISTRIBUTION, null, InputOption::VALUE_NONE, 'Option to create spreadsheet listing apts wanting minutes hard copy -- for distribution.'),
                     ))
@@ -224,9 +224,8 @@ class ProgramExecuteCommand extends ContainerAwareCommand {
         $this->runReportOnAptsWithNoShareholderEmail = ( is_null( $input->getOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL)) ? FALSE
                                                : ( strtolower($input->getOption(self::REPORT_ON_APTS_WITH_NO_SHAREHOLDER_EMAIL)) == 'y' ? TRUE : FALSE ) );
 
-        // default is FALSE, so anything other than parameter of 'y' is interpreted as FALSE...
-        $this->runMemoDistributionListReport = ( is_null( $input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) ? FALSE
-            : ( strtolower($input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT)) == 'y' ? TRUE : FALSE ) );
+
+        $this->runMemoDistributionListReport = $input->getOption(self::MEMO_DISTRIBUTION_LIST_REPORT);
 
 
         $this->runReportMinutesHardCopyForReference = $input->getOption(self::REPORT_MINUTES_HARD_COPY_FOR_REFERENCE);
